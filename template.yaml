@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: JWE Encryption and Decryption Lambda Functions
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 10
+    MemorySize: 256
+    Environment:
+      Variables:
+        PRIVATE_KEY_SECRET_NAME: jwt-jwe/private-key
+        PUBLIC_KEY_SECRET_NAME: jwt-jwe/public-key
+        JWT_EXPIRATION: 1h
+
+Resources:
+  JoseEncryptorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: jose-encryptor
+      Handler: src/encryptor/handler.handler
+      Description: Recibe un payload JSON y retorna un token JWE encriptado
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:jwt-jwe/private-key*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:jwt-jwe/public-key*
+      Events:
+        EncryptApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JweApi
+            Path: /encrypt
+            Method: POST
+
+  JoseDecryptorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: jose-decryptor
+      Handler: src/decryptor/handler.handler
+      Description: Recibe un token JWE y retorna el payload JSON desencriptado
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:jwt-jwe/private-key*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:jwt-jwe/public-key*
+      Events:
+        DecryptApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JweApi
+            Path: /decrypt
+            Method: POST
+
+  JweApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: jwe-api
+      StageName: prod
+
+Outputs:
+  EncryptEndpoint:
+    Description: URL del endpoint de encriptación
+    Value: !Sub https://${JweApi}.execute-api.${AWS::Region}.amazonaws.com/prod/encrypt
+
+  DecryptEndpoint:
+    Description: URL del endpoint de desencriptación
+    Value: !Sub https://${JweApi}.execute-api.${AWS::Region}.amazonaws.com/prod/decrypt
+
+  JoseEncryptorFunctionArn:
+    Description: ARN de la función jose-encryptor
+    Value: !GetAtt JoseEncryptorFunction.Arn
+
+  JoseDecryptorFunctionArn:
+    Description: ARN de la función jose-decryptor
+    Value: !GetAtt JoseDecryptorFunction.Arn
