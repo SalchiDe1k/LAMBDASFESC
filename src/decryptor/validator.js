@@ -1,6 +1,7 @@
 'use strict';
 
 const { ValidationError } = require('../shared/errors');
+const { parseRequestBody, requireStringField } = require('../shared/requestParser');
 
 /**
  * Valida el input del evento de la Decryption Lambda.
@@ -10,21 +11,10 @@ const { ValidationError } = require('../shared/errors');
  * @throws {ValidationError} si el JWE es inválido
  */
 function validateDecryptInput(event) {
-  let body;
+  const body = parseRequestBody(event.body, 'jwe');
+  const jwe = requireStringField(body, 'jwe');
 
-  try {
-    body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
-  } catch {
-    throw new ValidationError("El campo 'jwe' es requerido y debe ser un JWE en formato compacto");
-  }
-
-  if (!body || typeof body !== 'object') {
-    throw new ValidationError("El campo 'jwe' es requerido y debe ser un JWE en formato compacto");
-  }
-
-  const { jwe } = body;
-
-  if (typeof jwe !== 'string' || jwe.split('.').length !== 5) {
+  if (jwe.split('.').length !== 5) {
     throw new ValidationError("El campo 'jwe' es requerido y debe ser un JWE en formato compacto");
   }
 

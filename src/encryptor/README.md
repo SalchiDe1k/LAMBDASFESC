@@ -34,10 +34,11 @@ POST /encrypt { payload: {...} }
 
 | Variable | Descripción | Default |
 |----------|-------------|---------|
-| `PRIVATE_KEY_SECRET_NAME` | Nombre del secreto (clave privada RSA PKCS#8) | `jwt-jwe/private-key` |
-| `PUBLIC_KEY_SECRET_NAME` | Nombre del secreto (clave pública RSA SPKI) | `jwt-jwe/public-key` |
+| `PRIVATE_KEY_SECRET_NAME` | Nombre del secreto (clave privada RSA PKCS#8) | `alvaro-mejia/jwt-jwe/private-key` |
+| `PUBLIC_KEY_SECRET_NAME` | Nombre del secreto (clave pública RSA SPKI) | `alvaro-mejia/jwt-jwe/public-key` |
 | `JWT_EXPIRATION` | Expiración del JWT generado | `1h` |
 | `AWS_REGION` | Región AWS | provisto por Lambda runtime |
+| `AWS_PROFILE` | Perfil AWS local para despliegue | `alvaro-mejia` |
 
 ## Contrato de interfaz
 

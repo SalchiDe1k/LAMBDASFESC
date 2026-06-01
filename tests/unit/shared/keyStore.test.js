@@ -2,6 +2,10 @@
 
 const { KeyStoreError } = require('../../../src/shared/errors');
 
+jest.mock('@aws-sdk/credential-providers', () => ({
+  fromIni: jest.fn((options) => `ini:${options.profile}`)
+}));
+
 // Mock @aws-sdk/client-secrets-manager before requiring keyStore
 jest.mock('@aws-sdk/client-secrets-manager', () => {
   const mockSend = jest.fn();
@@ -20,7 +24,7 @@ jest.mock('@aws-sdk/client-secrets-manager', () => {
 });
 
 // Retrieve the mock send function for use in tests
-const { __mockSend: mockSend } = require('@aws-sdk/client-secrets-manager');
+const { __mockSend: mockSend, SecretsManagerClient } = require('@aws-sdk/client-secrets-manager');
 
 // keyStore must be required AFTER the mock is set up
 const { getKeys, clearCache } = require('../../../src/shared/keyStore');
@@ -36,8 +40,10 @@ beforeEach(() => {
     .mockResolvedValueOnce({ SecretString: FAKE_PRIVATE_KEY })
     .mockResolvedValueOnce({ SecretString: FAKE_PUBLIC_KEY });
 
-  process.env.PRIVATE_KEY_SECRET_NAME = 'jwt-jwe/private-key';
-  process.env.PUBLIC_KEY_SECRET_NAME = 'jwt-jwe/public-key';
+  delete process.env.AWS_PROFILE;
+  process.env.AWS_REGION = 'us-east-1';
+  process.env.PRIVATE_KEY_SECRET_NAME = 'alvaro-mejia/jwt-jwe/private-key';
+  process.env.PUBLIC_KEY_SECRET_NAME = 'alvaro-mejia/jwt-jwe/public-key';
 });
 
 describe('keyStore.getKeys()', () => {
@@ -81,6 +87,27 @@ describe('keyStore.getKeys()', () => {
     expect(keys2).toBe(keys3);
   });
 
+  test('usa la región por defecto cuando AWS_REGION no está configurado', async () => {
+    delete process.env.AWS_REGION;
+    clearCache();
+
+    await getKeys();
+
+    expect(SecretsManagerClient).toHaveBeenCalledWith({ region: 'us-east-1' });
+  });
+
+  test('usa el perfil de AWS_PROFILE cuando está definido', async () => {
+    process.env.AWS_PROFILE = 'alvaro-mejia';
+    clearCache();
+
+    await getKeys();
+
+    expect(SecretsManagerClient).toHaveBeenCalledWith({
+      region: 'us-east-1',
+      credentials: 'ini:alvaro-mejia'
+    });
+  });
+
   test('clearCache() fuerza una nueva llamada a Secrets Manager en la siguiente invocación', async () => {
     // Primera llamada — usa Secrets Manager
     await getKeys();
@@ -106,7 +133,7 @@ describe('keyStore.getKeys()', () => {
       fail('Debería haber lanzado KeyStoreError');
     } catch (err) {
       expect(err).toBeInstanceOf(KeyStoreError);
-      expect(err.message).toContain('jwt-jwe/private-key');
+      expect(err.message).toContain('alvaro-mejia/jwt-jwe/private-key');
     }
   });
 });

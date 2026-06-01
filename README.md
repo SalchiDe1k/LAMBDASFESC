@@ -9,12 +9,39 @@ AWS Lambda functions for JWE encryption/decryption using RSA-OAEP-256 + A256GCM,
 | `jose-encryptor` | `POST /encrypt` | Recibe un payload JSON y retorna un token JWE encriptado |
 | `jose-decryptor` | `POST /decrypt` | Recibe un token JWE y retorna el payload JSON desencriptado |
 
+## AWS profile y despliegue
+
+Este repo está preparado para desplegarse con un perfil AWS separado llamado `alvaro-mejia`.
+
+1. Crear el perfil de AWS con las credenciales de Álvaro Mejía:
+
+```bash
+aws configure --profile alvaro-mejia
+```
+
+2. Usar el perfil en el despliegue local o exportar la variable de entorno:
+
+```bash
+export AWS_PROFILE=alvaro-mejia
+export AWS_REGION=us-east-1
+```
+
+También puedes copiar `.env.sample` a `.env` y cargar esas variables durante el desarrollo local.
+
+3. Desplegar con el script dedicado:
+
+```bash
+npm run deploy:alvaro
+```
+
 ## Endpoints (AWS)
 
-| Endpoint | URL |
-|----------|-----|
-| Encriptar | `https://zfc2k21img.execute-api.us-east-1.amazonaws.com/prod/encrypt` |
-| Desencriptar | `https://zfc2k21img.execute-api.us-east-1.amazonaws.com/prod/decrypt` |
+Los endpoints finales se generan en los outputs del deploy. Después de desplegar, el stack `jwt-jwe-lambdas-alvaro` proveerá los outputs:
+
+- `EncryptEndpoint`
+- `DecryptEndpoint`
+
+Estos valores estarán disponibles desde la consola de CloudFormation o el log de `sam deploy`.
 
 ## Flujo criptográfico
 
@@ -50,8 +77,8 @@ Las claves RSA se almacenan en **AWS Secrets Manager** y se recuperan en tiempo 
 
 | Secreto | Contenido |
 |---------|-----------|
-| `jwt-jwe/private-key` | Clave privada RSA-2048 (PKCS#8 PEM) |
-| `jwt-jwe/public-key` | Clave pública RSA-2048 (SPKI PEM) |
+| `alvaro-mejia/jwt-jwe/private-key` | Clave privada RSA-2048 (PKCS#8 PEM) |
+| `alvaro-mejia/jwt-jwe/public-key` | Clave pública RSA-2048 (SPKI PEM) |
 
 ## Spec-Driven Development
 
@@ -133,5 +160,5 @@ jwt-jwe-lambdas/
 
 ```bash
 sam build
-sam deploy --stack-name jwt-jwe-lambdas --region us-east-1 --capabilities CAPABILITY_IAM --resolve-s3
+npm run deploy:alvaro
 ```

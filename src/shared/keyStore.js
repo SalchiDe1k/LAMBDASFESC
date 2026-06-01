@@ -1,12 +1,29 @@
 'use strict';
 
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
+const { fromIni } = require('@aws-sdk/credential-providers');
 const { KeyStoreError } = require('./errors');
 
-// Caché a nivel de módulo — persiste entre invocaciones del mismo contenedor Lambda
 let cachedKeys = null;
+let cachedClient = null;
 
-const client = new SecretsManagerClient({ region: process.env.AWS_REGION });
+function buildAwsConfig() {
+  const config = { region: process.env.AWS_REGION || 'us-east-1' };
+
+  if (process.env.AWS_PROFILE) {
+    config.credentials = fromIni({ profile: process.env.AWS_PROFILE });
+  }
+
+  return config;
+}
+
+function getClient() {
+  if (!cachedClient) {
+    cachedClient = new SecretsManagerClient(buildAwsConfig());
+  }
+
+  return cachedClient;
+}
 
 /**
  * Recupera un secreto de AWS Secrets Manager por nombre.
@@ -15,9 +32,13 @@ const client = new SecretsManagerClient({ region: process.env.AWS_REGION });
  * @throws {KeyStoreError} si el secreto no puede ser recuperado
  */
 async function getSecret(secretName) {
+  if (!secretName) {
+    throw new KeyStoreError('Las variables de entorno PRIVATE_KEY_SECRET_NAME y PUBLIC_KEY_SECRET_NAME deben estar configuradas');
+  }
+
   try {
     const command = new GetSecretValueCommand({ SecretId: secretName });
-    const response = await client.send(command);
+    const response = await getClient().send(command);
     return response.SecretString;
   } catch (err) {
     throw new KeyStoreError(
@@ -51,10 +72,11 @@ async function getKeys() {
 }
 
 /**
- * Limpia el caché de claves (usado en tests).
+ * Limpia el caché de claves y el cliente de AWS (usado en tests).
  */
 function clearCache() {
   cachedKeys = null;
+  cachedClient = null;
 }
 
 module.exports = { getKeys, clearCache };

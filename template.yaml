@@ -9,10 +9,9 @@ Globals:
     MemorySize: 256
     Environment:
       Variables:
-        PRIVATE_KEY_SECRET_NAME: jwt-jwe/private-key
-        PUBLIC_KEY_SECRET_NAME: jwt-jwe/public-key
-        JWT_EXPIRATION: 1h
-
+          PRIVATE_KEY_SECRET_NAME: alvaro-mejia/jwt-jwe/private-key
+          PUBLIC_KEY_SECRET_NAME: alvaro-mejia/jwt-jwe/public-key
+          JWT_EXPIRATION: 1h
 Resources:
   JoseEncryptorFunction:
     Type: AWS::Serverless::Function
@@ -26,8 +25,8 @@ Resources:
               Action:
                 - secretsmanager:GetSecretValue
               Resource:
-                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:jwt-jwe/private-key*
-                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:jwt-jwe/public-key*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:alvaro-mejia/jwt-jwe/private-key*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:alvaro-mejia/jwt-jwe/public-key*
       Events:
         EncryptApi:
           Type: Api
@@ -48,8 +47,8 @@ Resources:
               Action:
                 - secretsmanager:GetSecretValue
               Resource:
-                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:jwt-jwe/private-key*
-                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:jwt-jwe/public-key*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:alvaro-mejia/jwt-jwe/private-key*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:alvaro-mejia/jwt-jwe/public-key*
       Events:
         DecryptApi:
           Type: Api
@@ -61,7 +60,7 @@ Resources:
   JweApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: jwe-api
+      Name: jwe-api-alvaro
       StageName: prod
 
 Outputs:

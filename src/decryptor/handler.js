@@ -5,8 +5,7 @@ const keyStore = require('../shared/keyStore');
 const { decryptJWE } = require('./jweDecryptor');
 const { verifyJWT } = require('./jwtVerifier');
 const { AppError } = require('../shared/errors');
-
-const HEADERS = { 'Content-Type': 'application/json' };
+const { jsonResponse, errorResponse } = require('../shared/httpResponse');
 
 /**
  * Handler de la Decryption Lambda.
@@ -22,25 +21,13 @@ async function handler(event) {
     const jwt = await decryptJWE(jwe, privateKeyPem);
     const { jwt: verifiedJwt, claims } = await verifyJWT(jwt, publicKeyPem);
 
-    return {
-      statusCode: 200,
-      headers: HEADERS,
-      body: JSON.stringify({ jwt: verifiedJwt, claims })
-    };
+    return jsonResponse({ jwt: verifiedJwt, claims });
   } catch (err) {
     if (err instanceof AppError) {
-      return {
-        statusCode: err.statusCode,
-        headers: HEADERS,
-        body: JSON.stringify({ error: err.message })
-      };
+      return errorResponse(err.message, err.statusCode);
     }
 
-    return {
-      statusCode: 500,
-      headers: HEADERS,
-      body: JSON.stringify({ error: 'Error interno del servidor' })
-    };
+    return errorResponse('Error interno del servidor', 500);
   }
 }
 

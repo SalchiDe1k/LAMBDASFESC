@@ -1,6 +1,7 @@
 'use strict';
 
 const { ValidationError } = require('../shared/errors');
+const { parseRequestBody, requireObjectField } = require('../shared/requestParser');
 
 /**
  * Valida el input del evento de la Encryption Lambda.
@@ -10,30 +11,8 @@ const { ValidationError } = require('../shared/errors');
  * @throws {ValidationError} si el payload es inválido
  */
 function validateEncryptInput(event) {
-  let body;
-
-  try {
-    body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
-  } catch {
-    throw new ValidationError("El campo 'payload' es requerido y debe ser un objeto JSON válido");
-  }
-
-  if (!body || typeof body !== 'object') {
-    throw new ValidationError("El campo 'payload' es requerido y debe ser un objeto JSON válido");
-  }
-
-  const { payload } = body;
-
-  if (
-    payload === undefined ||
-    payload === null ||
-    typeof payload !== 'object' ||
-    Array.isArray(payload)
-  ) {
-    throw new ValidationError("El campo 'payload' es requerido y debe ser un objeto JSON válido");
-  }
-
-  return payload;
+  const body = parseRequestBody(event.body, 'payload');
+  return requireObjectField(body, 'payload');
 }
 
 module.exports = { validateEncryptInput };

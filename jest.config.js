@@ -4,6 +4,7 @@ module.exports = {
     '**/tests/unit/**/*.test.js',
     '**/tests/property/**/*.property.test.js'
   ],
+  testPathIgnorePatterns: ['<rootDir>/.aws-sam/'],
   collectCoverageFrom: ['src/**/*.js'],
   coverageThreshold: {
     global: {
