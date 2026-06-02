@@ -99,7 +99,7 @@ npm run test:property # solo property-based
 
 ### Resultados
 
-![Tests pasando](docs/screenshots/tests-result.png)
+![Tests pasando](docs/screenshots/tests.jpeg)
 
 **10 suites — 90 tests — 100% PASS**
 
@@ -114,11 +114,11 @@ npm run test:property # solo property-based
 
 ### jose-encryptor — payload → JWE
 
-![Encryptor en Postman](docs/screenshots/encryptor-postman.png)
+![Encryptor en Postman](docs/screenshots/encript.jpeg)
 
 ### jose-decryptor — JWE → claims
 
-![Decryptor en Postman](docs/screenshots/decryptor-postman.png)
+![Decryptor en Postman](docs/screenshots/desencrypt.jpeg)
 
 ## Estructura del proyecto
 
