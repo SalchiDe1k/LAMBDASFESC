@@ -118,7 +118,7 @@ npm run test:property # solo property-based
 
 ### jose-decryptor — JWE → claims
 
-![Decryptor en Postman](docs/screenshots/decryptor-postman.jpeg)
+![Decryptor en Postman](docs/screenshots/decryptor-postman-v2.jpeg)
 
 ## Estructura del proyecto
 

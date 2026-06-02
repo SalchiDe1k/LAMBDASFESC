@@ -123,4 +123,4 @@ Tests: 28 passed
 }
 ```
 
-![Decryptor en Postman — POST /decrypt → 200 OK con claims](../../docs/screenshots/decryptor-postman.jpeg)
+![Decryptor en Postman — POST /decrypt → 200 OK con claims](../../docs/screenshots/decryptor-postman-v2.jpeg)
