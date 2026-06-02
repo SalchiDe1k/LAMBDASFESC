@@ -100,7 +100,7 @@ PASS tests/unit/encryptor/jweEncryptor.test.js
 Tests: 24 passed
 ```
 
-![Tests pasando](../../docs/screenshots/tests-result.png)
+![Tests pasando](../../docs/screenshots/tests-result.jpeg)
 
 ## Evidencia de funcionamiento
 
@@ -119,4 +119,4 @@ Tests: 24 passed
 
 **Output:** `200 OK` con JWE en formato compacto (5 partes separadas por `.`, RSA-OAEP-256 + A256GCM).
 
-![Encryptor en Postman — POST /encrypt → 200 OK con JWE](../../docs/screenshots/encryptor-postman.png)
+![Encryptor en Postman — POST /encrypt → 200 OK con JWE](../../docs/screenshots/encryptor-postman.jpeg)

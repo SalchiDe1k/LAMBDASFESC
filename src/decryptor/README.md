@@ -100,7 +100,7 @@ PASS tests/unit/decryptor/jwtVerifier.test.js
 Tests: 28 passed
 ```
 
-![Tests pasando](../../docs/screenshots/tests-result.png)
+![Tests pasando](../../docs/screenshots/tests-result.jpeg)
 
 ## Evidencia de funcionamiento
 
@@ -123,4 +123,4 @@ Tests: 28 passed
 }
 ```
 
-![Decryptor en Postman — POST /decrypt → 200 OK con claims](../../docs/screenshots/decryptor-postman.png)
+![Decryptor en Postman — POST /decrypt → 200 OK con claims](../../docs/screenshots/decryptor-postman.jpeg)
